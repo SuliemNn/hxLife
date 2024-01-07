@@ -1,5 +1,7 @@
 package com.hmdp.utils;
 
+import java.util.Random;
+
 public class RedisConstants {
     public static final String LOGIN_CODE_KEY = "login:code:";
     public static final Long LOGIN_CODE_TTL = 2L;
@@ -19,4 +21,5 @@ public class RedisConstants {
     public static final String FEED_KEY = "feed:";
     public static final String SHOP_GEO_KEY = "shop:geo:";
     public static final String USER_SIGN_KEY = "sign:";
+    public static final int RANDOM_EXPIRE_TIME = new Random().nextInt(5) + 1;
 }
