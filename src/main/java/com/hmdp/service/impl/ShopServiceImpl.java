@@ -2,18 +2,25 @@ package com.hmdp.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.hmdp.dto.Result;
 import com.hmdp.entity.Shop;
 import com.hmdp.mapper.ShopMapper;
 import com.hmdp.service.IShopService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.hmdp.utils.MyBloomFilter;
+import io.lettuce.core.dynamic.annotation.Param;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import redis.clients.jedis.Jedis;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.hmdp.utils.RedisConstants.RANDOM_EXPIRE_TIME;
@@ -55,8 +62,26 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private MyBloomFilter myBloomFilter;
+    @Resource
+    private ShopMapper shopMapper;
+
+    @PostConstruct
+    public  void init(){
+        List<Shop> shops = shopMapper.selectList(null);
+        for (Shop shop : shops){
+            myBloomFilter.add(shop.getId());
+        }
+    }
+
     @Override
     public Result queryById(Long id) {
+        //先从布隆过滤中判断是否有这个数据
+        if(!myBloomFilter.contains(id)){
+            return Result.fail("不包含这个id");
+        }
+
 
         String key = "cache:shop:" + id;
         // 1. 从redis查询商铺缓存
