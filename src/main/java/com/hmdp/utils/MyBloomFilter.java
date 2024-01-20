@@ -1,29 +1,9 @@
 package com.hmdp.utils;
-import com.hmdp.service.IShopService;
-import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 import java.util.BitSet;
-import java.util.Set;
 
-@Component
 public class MyBloomFilter {
 
 
-
-    /**
-     * 初始化多个包含 hash 函数的类的数组，每个类中的 hash 函数都不一样
-     */
-
-    public MyBloomFilter() {
-        // 初始化多个不同的 Hash 函数
-        for (int i = 0; i < SEEDS.length; i++) {
-            func[i] = new SimpleHash(DEFAULT_SIZE, SEEDS[i]);
-        }
-    }
 
     /**
      * 位数组的大小
@@ -44,9 +24,15 @@ public class MyBloomFilter {
      */
     private SimpleHash[] func = new SimpleHash[SEEDS.length];
 
-
-
-
+    /**
+     * 初始化多个包含 hash 函数的类的数组，每个类中的 hash 函数都不一样
+     */
+    public MyBloomFilter() {
+        // 初始化多个不同的 Hash 函数
+        for (int i = 0; i < SEEDS.length; i++) {
+            func[i] = new SimpleHash(DEFAULT_SIZE, SEEDS[i]);
+        }
+    }
 
     /**
      * 添加元素到位数组

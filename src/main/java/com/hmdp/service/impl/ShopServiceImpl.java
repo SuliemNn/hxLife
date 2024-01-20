@@ -9,6 +9,7 @@ import com.hmdp.mapper.ShopMapper;
 import com.hmdp.service.IShopService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.utils.MyBloomFilter;
+import com.hmdp.utils.MyBloomFilterSingleton;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,44 +37,28 @@ import static com.hmdp.utils.RedisConstants.RANDOM_EXPIRE_TIME;
 @Service
 public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IShopService {
 
-    @Test
-    public void mytest00231(){
-        // Redis服务器地址和端口号
-        String host = "localhost";
-        int port = 6379;
 
-        // 创建Jedis实例
-        try (Jedis jedis = new Jedis("127.0.0.1", 6379)) {
-            // 如果Redis服务器需要密码认证
-            // 设置Key
-            String key = "exampleKey";
-            String value = "exampleValue";
-            jedis.set(key, value);
 
-            System.out.println("Key set successfully!");
-
-            // 获取Key的值
-            String retrievedValue = jedis.get(key);
-            System.out.println("Retrieved value for key " + key + ": " + retrievedValue);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-    @Resource
-    private MyBloomFilter myBloomFilter;
+
+
     @Resource
     private ShopMapper shopMapper;
 
+    MyBloomFilter myBloomFilter = MyBloomFilterSingleton.getInstance();
+
     @PostConstruct
-    public  void init(){
+    public void init(){
         List<Shop> shops = shopMapper.selectList(null);
+
         for (Shop shop : shops){
             myBloomFilter.add(shop.getId());
         }
     }
+
+
 
     @Override
     public Result queryById(Long id) {
