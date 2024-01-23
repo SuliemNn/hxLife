@@ -17,11 +17,7 @@
         <java.version>1.8</java.version>
     </properties>
     <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
 
-        </dependency>
 
         <dependency>
             <groupId>redis.clients</groupId>

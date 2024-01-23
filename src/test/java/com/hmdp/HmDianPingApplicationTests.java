@@ -1,17 +1,74 @@
 package com.hmdp;
 
+import com.hmdp.service.impl.ShopServiceImpl;
 import com.hmdp.utils.MyBloomFilter;
 import com.hmdp.utils.MyBloomFilterSingleton;
-import org.junit.Test;
+import com.hmdp.utils.RedisIDWorker;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @SpringBootTest
-public
 class HmDianPingApplicationTests {
 
+    @Resource
+    private ShopServiceImpl shopService;
+
+    @Resource
+    private RedisIDWorker redisIDWorker;
+
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
+    private ExecutorService es = Executors.newFixedThreadPool(500);
+
+
+    @Test
+    void testIdWorker() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(300);
+
+        Runnable task = () -> {
+            for (int i = 0; i < 100; i++) {
+                long id = redisIDWorker.nextId("order");
+                System.out.println("id = " + id);
+            }
+            latch.countDown();
+        };
+        long begin = System.currentTimeMillis();
+        for (int i = 0; i < 300; i++) {
+            es.submit(task);
+        }
+        latch.await();
+        long end = System.currentTimeMillis();
+        System.out.println("time = " + (end - begin));
+    }
+
+    @Test
+    void testInjection() throws InterruptedException {
+        System.out.println("seasd");
+
+        // 检查Bean是否成功注入
+        checkBean("shopService", shopService);
+        checkBean("redisIDWorker", redisIDWorker);
+        checkBean("stringRedisTemplate", stringRedisTemplate);
+    }
+
+    private void checkBean(String beanName, Object bean) {
+        if (bean != null) {
+            System.out.println(beanName + " bean successfully injected.");
+        } else {
+            System.err.println(beanName + " bean injection failed!");
+        }
+    }
+
+    //测试布隆过滤器
     @Test
     public void test01(){
         ArrayList<String> arrayList=new ArrayList<>();
@@ -51,11 +108,12 @@ class HmDianPingApplicationTests {
 
         double falsePositiveRate = (double) falsePositiveCount / totalTests;
         System.out.println("False Positive Rate: " + falsePositiveRate);
+        System.out.println(falsePositiveCount);
     }
 
     private static String generateRandomString() {
         // 生成一个随机字符串
-        int length = 20;
+        int length = 25;
         String characters = "abcdefghijklmnopqrstuvwxyz";
         StringBuilder randomString = new StringBuilder();
 

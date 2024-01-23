@@ -8,7 +8,7 @@ public class MyBloomFilter {
     /**
      * 位数组的大小
      */
-    private static final int DEFAULT_SIZE = 2 << 24;
+    private static final int DEFAULT_SIZE = 2 << 16;
     /**
      * 通过这个数组可以创建 6 个不同的哈希函数
      */
