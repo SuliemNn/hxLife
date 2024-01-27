@@ -20,4 +20,8 @@ public interface IBlogService extends IService<Blog> {
     public Result likeBlog(Long id);
 
     Result queryHotBlog(Integer current);
+
+    Result saveBlog(Blog blog);
+
+    Result queryBlogOfFollow(Long max, Integer offset);
 }
