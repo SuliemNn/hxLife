@@ -10,6 +10,8 @@ import com.hmdp.service.IShopService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.utils.MyBloomFilter;
 import com.hmdp.utils.MyBloomFilterSingleton;
+import com.hmdp.utils.bloomFilter.BloomFilter;
+import com.hmdp.utils.bloomFilter.BloomFilterFactory;
 import io.lettuce.core.dynamic.annotation.Param;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +49,11 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     @Resource
     private ShopMapper shopMapper;
 
-    MyBloomFilter myBloomFilter = MyBloomFilterSingleton.getInstance();
+    BloomFilter myBloomFilter = BloomFilterFactory.createBloomFilter(5000,0.001);
 
+    /**
+     * 初始化布隆过滤器，将数据库中的数据初始化进入布隆过滤器中
+     */
     @PostConstruct
     public void init(){
         List<Shop> shops = shopMapper.selectList(null);
@@ -75,10 +80,12 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
         if (StrUtil.isNotBlank(shopJson)){
             // 3.存在，直接返回
             Shop shop = JSONUtil.toBean(shopJson,Shop.class);
+            myBloomFilter.add(shop.getId());
             return Result.ok(shop);
         }
         // 4.不存在，根据id查询数据库
         Shop shop = getById(id);
+        myBloomFilter.add(shop.getId());
         // 5.不存在，返回错误
         if (shop == null){
             return  Result.fail("商铺不存在！");
