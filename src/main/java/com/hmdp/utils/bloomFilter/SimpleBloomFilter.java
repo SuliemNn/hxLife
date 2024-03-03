@@ -32,7 +32,6 @@ public class SimpleBloomFilter implements BloomFilter{
     /**
      * 存放包含 hash 函数的类的数组
      */
-//    private MyBloomFilter.SimpleHash[] func = new MyBloomFilter.SimpleHash[];
     private ArrayList<SimpleHash> func = new ArrayList<>();
 
     /**

@@ -21,7 +21,7 @@ public class FactoryTest {
         // 添加一千个随机字符串
         Set<String> dataSet = new HashSet<>();
         Random random = new Random();
-        for (int i = 0; i < dataSize+2000; i++) {
+        for (int i = 0; i < dataSize+5000; i++) {
             String randomString = generateRandomString(10, random);
             dataSet.add(randomString);
             bloomFilter.add(randomString);
@@ -59,7 +59,7 @@ public class FactoryTest {
         // 添加一千个随机字符串
         Set<String> dataSet = new HashSet<>();
         Random random = new Random();
-        for (int i = 0; i < dataSize+2000; i++) {
+        for (int i = 0; i < dataSize+5000; i++) {
             String randomString = generateRandomString(10, random);
             dataSet.add(randomString);
             bloomFilter.add(randomString);

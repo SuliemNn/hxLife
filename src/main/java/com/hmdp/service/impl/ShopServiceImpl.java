@@ -49,7 +49,7 @@ public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IS
     @Resource
     private ShopMapper shopMapper;
 
-    BloomFilter myBloomFilter = BloomFilterFactory.createAdaptBloomFilter(1000,0.001);
+    BloomFilter myBloomFilter = BloomFilterFactory.createBloomFilter(1000,0.001);
 
     /**
      * 初始化布隆过滤器，将数据库中的数据初始化进入布隆过滤器中

@@ -40,6 +40,7 @@ public class AdaptBloomFilter implements BloomFilter{
     }
 
     private void expand(){
-        this.bloomList.add(BloomFilterFactory.createBloomFilter((int) (n*0.5),p));
+        this.bloomList.add(BloomFilterFactory.createBloomFilter((int) (n),p));
+        n= (n*2);
     }
 }
