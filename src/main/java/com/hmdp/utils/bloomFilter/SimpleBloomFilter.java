@@ -1,7 +1,5 @@
 package com.hmdp.utils.bloomFilter;
 
-import com.hmdp.utils.MyBloomFilter;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -10,7 +8,7 @@ import java.util.List;
 /**
  * 接受预期size和hash函数个数，并以此创建布隆过滤器
  */
-public class YugBloomFilter implements BloomFilter{
+public class SimpleBloomFilter implements BloomFilter{
     /**
      * 位数组的大小
      */
@@ -40,7 +38,7 @@ public class YugBloomFilter implements BloomFilter{
     /**
      * 初始化多个包含 hash 函数的类的数组，每个类中的 hash 函数都不一样
      */
-    public YugBloomFilter(int size, int k) {
+    public SimpleBloomFilter(int size, int k) {
         this.size=size;
         this.k=k;
         this.bits = new BitSet(size);

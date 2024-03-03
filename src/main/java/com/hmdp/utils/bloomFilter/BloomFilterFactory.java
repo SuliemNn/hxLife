@@ -5,10 +5,26 @@ package com.hmdp.utils.bloomFilter;
  * 给定 预期数据量 n 和误差率 p 计算得到所需布隆过滤器的 size 和哈希函数个数 k
  */
 public class BloomFilterFactory {
+    /**
+     * 创建普通布隆过滤器
+     * @param n
+     * @param p
+     * @return
+     */
     public static BloomFilter createBloomFilter(int n, double p){
         int size = getSizeOfBloomFilter(n,p);
         int k =getNumberOfHashFuc(size,n);
-        return new YugBloomFilter(size,k);
+        return new SimpleBloomFilter(size,k);
+    }
+
+    /**
+     * 创建自适应布隆过滤器
+     * @param n
+     * @param p
+     * @return
+     */
+    public static BloomFilter createAdaptBloomFilter(int n, double p){
+        return new AdaptBloomFilter(n,p);
     }
 
     /**
