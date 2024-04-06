@@ -13,6 +13,8 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2021-12-22
  */
 public interface IBlogService extends IService<Blog> {
+    public Result queryBlogByIdQuick0(Long id);
+    public Result queryBlogByIdQuick1(Long id);
 
     Result queryBlogById(Long id);
 

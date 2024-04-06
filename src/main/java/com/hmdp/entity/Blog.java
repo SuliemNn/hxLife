@@ -92,4 +92,28 @@ public class Blog implements Serializable {
     private LocalDateTime updateTime;
 
 
+    public Blog(BlogContent Content,BlogHomePage homePage){
+//        private Long tbId;
+//        private String images;
+//        private Integer liked;
+//        private Integer comments;
+//        private LocalDateTime createTime;
+//        private LocalDateTime updateTime;
+//        private Long shopId;
+//        private Long userId;
+        //Blog blog = new Blog();
+        id = homePage.getTbId();
+        images = homePage.getImages();
+        liked = homePage.getLiked();
+        comments=homePage.getComments();
+        createTime=homePage.getCreateTime();
+        updateTime=homePage.getUpdateTime();
+        shopId=homePage.getShopId();
+        userId=homePage.getUserId();
+        content = Content.getContent();
+    }
+
+    public Blog() {
+
+    }
 }
