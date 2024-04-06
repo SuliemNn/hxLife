@@ -1,5 +1,10 @@
 package com.hmdp;
 
+import com.hmdp.dto.Result;
+import com.hmdp.entity.BlogContent;
+import com.hmdp.service.IBlogContent;
+import com.hmdp.service.IBlogHomePage;
+import com.hmdp.service.IBlogService;
 import com.hmdp.service.impl.ShopServiceImpl;
 import com.hmdp.utils.MyBloomFilter;
 import com.hmdp.utils.MyBloomFilterSingleton;
@@ -35,7 +40,43 @@ class HmDianPingApplicationTests {
 
     private ExecutorService es = Executors.newFixedThreadPool(500);
 
+    @Resource
+    private IBlogService blogService;
 
+    @Resource
+    private IBlogHomePage blogHomePage;
+    @Resource
+    private IBlogContent blogContent;
+    @Test
+    void testBlog(){
+        int times=5000;
+        //单表查询
+        long begin = System.currentTimeMillis();
+        for (int i = 0; i < times; i++) {
+            Result result = blogService.queryBlogById(5L);
+        }
+        long end = System.currentTimeMillis();
+
+
+        //双表顺序查询
+        long begin1 = System.currentTimeMillis();
+        for (int i = 0; i < times; i++) {
+            Result result1 = blogService.queryBlogByIdQuick0(5L);
+        }
+        long end1 = System.currentTimeMillis();
+
+
+        //双表线程池查询
+        long begin2 = System.currentTimeMillis();
+        for (int i = 0; i < times; i++) {
+            Result result2 = blogService.queryBlogByIdQuick1(5L);
+        }
+        long end2 = System.currentTimeMillis();
+        System.out.println("0:"+(end-begin));
+        System.out.println("1:"+(end1-begin1));
+        System.out.println("2:"+(end2-begin2));
+
+    }
     @Test
     void testIdWorker() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(300);
