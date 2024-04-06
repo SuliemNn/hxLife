@@ -2,23 +2,22 @@ package com.hmdp.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.hmdp.dto.Result;
 import com.hmdp.dto.ScrollResult;
 import com.hmdp.dto.UserDTO;
-import com.hmdp.entity.Blog;
-import com.hmdp.entity.Follow;
-import com.hmdp.entity.User;
+import com.hmdp.entity.*;
 import com.hmdp.mapper.BlogMapper;
-import com.hmdp.service.IBlogService;
+import com.hmdp.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hmdp.service.IFollowService;
-import com.hmdp.service.IUserService;
 import com.hmdp.utils.SystemConstants;
 import com.hmdp.utils.UserHolder;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
+import sun.nio.ch.ThreadPool;
 
 import javax.annotation.Resource;
 
@@ -26,6 +25,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import static com.hmdp.utils.RedisConstants.BLOG_LIKED_KEY;
@@ -41,6 +43,11 @@ import static com.hmdp.utils.RedisConstants.FEED_KEY;
  */
 @Service
 public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IBlogService {
+    private ExecutorService executorService = Executors.newFixedThreadPool(16);
+    @Resource
+    private IBlogHomePage blogHomePage;
+    @Resource
+    private IBlogContent blogContent;
     @Resource
     private IUserService userService;
 
@@ -138,7 +145,43 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
 
         return Result.ok(r);
     }
+    @Override
+    public Result queryBlogByIdQuick0(Long id){
 
+        BlogContent content = blogContent.getByTbId(id);
+        BlogHomePage homePage = blogHomePage.getByTbId(id);
+        Blog blog = new Blog(content,homePage);
+        if (blog == null) {
+            return Result.fail("笔记不存在！");
+        }
+        // 2.查询blog有关的用户
+        queryBlogUser(blog);
+        // 3.查询blog是否被点赞
+        isBlogLiked(blog);
+        return Result.ok(blog);
+    }
+    @Override
+    public Result queryBlogByIdQuick1(Long id){
+        Future<BlogContent> content = executorService.submit(() -> blogContent.getByTbId(id));
+        //BlogContent content = blogContent.getByTbId(id);
+        Future<BlogHomePage> homePage = executorService.submit(() -> blogHomePage.getByTbId(id));
+        //BlogHomePage homePage = blogHomePage.getByTbId(id);
+        Blog blog = null;
+        try{
+            blog = new Blog(content.get(),homePage.get());
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        
+        if (blog == null) {
+            return Result.fail("笔记不存在！");
+        }
+        // 2.查询blog有关的用户
+        queryBlogUser(blog);
+        // 3.查询blog是否被点赞
+        isBlogLiked(blog);
+        return Result.ok(blog);
+    }
     @Override
     public Result queryBlogById(Long id) {
         // 1.查询blog
@@ -153,6 +196,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         return Result.ok(blog);
     }
 
+    //只需要博客id
     private void isBlogLiked(Blog blog) {
         // 1.获取登录用户
         UserDTO user = UserHolder.getUser();
@@ -215,6 +259,7 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         return Result.ok(userDTOS);
     }
 
+    //需要博客关联的用户id
     private void queryBlogUser(Blog blog) {
         Long userId = blog.getUserId();
         User user = userService.getById(userId);
