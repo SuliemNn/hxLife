@@ -10,10 +10,12 @@ import com.hmdp.service.IBlogService;
 import com.hmdp.service.IUserService;
 import com.hmdp.utils.SystemConstants;
 import com.hmdp.utils.UserHolder;
+import com.hmdp.utils.limit.TokenBucketLimit;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/blog")
@@ -50,6 +52,7 @@ public class BlogController {
         return Result.ok(records);
     }
 
+    @TokenBucketLimit(key="hotBlog",permitsPerSecond = 2,timeout = 100,timeunit = TimeUnit.MICROSECONDS,msg = "系统繁忙，稍后重试！")
     @GetMapping("/hot")
     public Result queryHotBlog(@RequestParam(value = "current", defaultValue = "1") Integer current) {
         return blogService.queryHotBlog(current);
