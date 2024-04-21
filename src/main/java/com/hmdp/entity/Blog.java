@@ -112,6 +112,19 @@ public class Blog implements Serializable {
         userId=homePage.getUserId();
         content = Content.getContent();
     }
+    public void addContent(BlogContent Content){
+        content = Content.getContent();
+    }
+    public void addHomePage(BlogHomePage homePage){
+        id = homePage.getTbId();
+        images = homePage.getImages();
+        liked = homePage.getLiked();
+        comments=homePage.getComments();
+        createTime=homePage.getCreateTime();
+        updateTime=homePage.getUpdateTime();
+        shopId=homePage.getShopId();
+        userId=homePage.getUserId();
+    }
 
     public Blog() {
 
