@@ -13,6 +13,7 @@ import com.hmdp.mapper.BlogMapper;
 import com.hmdp.service.*;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.utils.SystemConstants;
+import com.hmdp.utils.TimeStamps;
 import com.hmdp.utils.UserHolder;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -44,6 +45,8 @@ import static com.hmdp.utils.RedisConstants.FEED_KEY;
 @Service
 public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IBlogService {
     private ExecutorService executorService = Executors.newFixedThreadPool(16);
+    @Resource
+    private IBlogRecordService blogRecordService;
     @Resource
     private IBlogHomePage blogHomePage;
     @Resource
@@ -158,6 +161,17 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         queryBlogUser(blog);
         // 3.查询blog是否被点赞
         isBlogLiked(blog);
+
+        //TODO 可以改为异步
+        //4.记录日志
+        UserDTO user= UserHolder.getUser();
+        if (user!=null){
+            BlogRecord blogRecord = new BlogRecord();
+            blogRecord.setBlogId(id);
+            blogRecord.setUserId(user.getId());
+            blogRecord.setTimestamp(TimeStamps.now());
+            blogRecordService.save(blogRecord);
+        }
         return Result.ok(blog);
     }
     @Override
@@ -180,6 +194,17 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         queryBlogUser(blog);
         // 3.查询blog是否被点赞
         isBlogLiked(blog);
+
+        //TODO 可以改为异步
+        //4.记录日志
+        UserDTO user= UserHolder.getUser();
+        if (user!=null){
+            BlogRecord blogRecord = new BlogRecord();
+            blogRecord.setBlogId(id);
+            blogRecord.setUserId(user.getId());
+            blogRecord.setTimestamp(TimeStamps.now());
+            blogRecordService.save(blogRecord);
+        }
         return Result.ok(blog);
     }
     @Override
@@ -193,6 +218,18 @@ public class BlogServiceImpl extends ServiceImpl<BlogMapper, Blog> implements IB
         queryBlogUser(blog);
         // 3.查询blog是否被点赞
         isBlogLiked(blog);
+
+        //TODO 可以改为异步
+        //4.记录日志
+        UserDTO user= UserHolder.getUser();
+        if (user!=null){
+            BlogRecord blogRecord = new BlogRecord();
+            blogRecord.setBlogId(id);
+            blogRecord.setUserId(user.getId());
+            blogRecord.setTimestamp(TimeStamps.now());
+            blogRecordService.save(blogRecord);
+        }
+
         return Result.ok(blog);
     }
 
