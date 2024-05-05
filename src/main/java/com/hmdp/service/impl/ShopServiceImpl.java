@@ -8,8 +8,7 @@ import com.hmdp.entity.Shop;
 import com.hmdp.mapper.ShopMapper;
 import com.hmdp.service.IShopService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.hmdp.utils.MyBloomFilter;
-import com.hmdp.utils.MyBloomFilterSingleton;
+
 import com.hmdp.utils.bloomFilter.BloomFilter;
 import com.hmdp.utils.bloomFilter.BloomFilterFactory;
 import io.lettuce.core.dynamic.annotation.Param;
@@ -38,10 +37,6 @@ import static com.hmdp.utils.RedisConstants.RANDOM_EXPIRE_TIME;
  */
 @Service
 public class ShopServiceImpl extends ServiceImpl<ShopMapper, Shop> implements IShopService {
-
-
-
-
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
